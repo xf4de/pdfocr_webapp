@@ -1,0 +1,8 @@
+ 
+{% extends "layout.html" %}
+{% block title %}result{% endblock %}
+{% block content %}
+<h1>Testo estratto</h1>
+<textarea class="form-control" rows="25">{{resulttext}}</textarea>
+<p>Scarica: <a download="file-{{data}}.txt" href="data:text/plain;base64,{{base64text}}">file-{{data}}.txt</a></p>
+{% endblock %} 
