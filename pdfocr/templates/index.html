@@ -3,7 +3,7 @@
 {% block title %}index{% endblock %}
 {% block content %}
 <h1>Estrazione testo pdf</h1>
-<form method="POST" enctype="multipart/form-data" action="/upload">
+<form method="POST" enctype="multipart/form-data" action="{{url_for('upload')}}">
     <div class="form-row">
         <div class="form-group col-sm-6">
             <label for="file">Seleziona file pdf:</label>
@@ -15,6 +15,18 @@
                 <option value="ita">Italiano</option>
                 <option value="eng">Inglese</option>
             </select>
+        </div>
+    </div>
+  <button type="submit" class="btn btn-secondary btn-large mt-4">Upload</button>
+</form>
+
+<hr>
+<h1>Unione file pdf</h1>
+<form method="POST" enctype="multipart/form-data" action="{{url_for('join')}}">
+    <div class="form-row">
+        <div class="form-group col-sm-6">
+            <label for="file">Seleziona i file pdf da unire:</label>
+            <input type="file" name="files[]" class="form-control-file" multiple="true" autocomplete="off" required>
         </div>
     </div>
   <button type="submit" class="btn btn-secondary btn-large mt-4">Upload</button>

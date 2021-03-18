@@ -1,10 +1,12 @@
  
 import os
 
-from flask import Flask, render_template, request, jsonify, flash
+from flask import Flask, render_template, request, jsonify, flash, send_file
 from werkzeug.utils import secure_filename
 from .conversion_utils import print_pages
 import datetime, base64
+from PyPDF2 import PdfFileMerger
+import io
 
 def create_app(test_config=None):
     # create and configure the app
@@ -19,7 +21,6 @@ def create_app(test_config=None):
         return '.' in filename and \
             filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-    # a simple page that says hello
     @app.route('/')
     def index():
         return render_template('index.html')
@@ -45,6 +46,33 @@ def create_app(test_config=None):
                 return render_template('result.html',
                         data=datetime.datetime.strftime(datetime.datetime.now(),"%Y-%m-%d"),
                         resulttext=text, base64text=base64.b64encode(text.encode('utf-8')).decode())
+
+    @app.route('/join',methods=['POST'])
+    def join():
+        if request.method == 'POST':
+
+            if 'files[]' not in request.files:
+                flash('No files')
+                return render_template('index.html')
+
+            merger = PdfFileMerger()
+            files = request.files.getlist('files[]')
+            files.sort(key=lambda x: x.filename) # sort by name
+            if len(files)>1:
+                for file in files:
+                    if file and allowed_file(file.filename):
+                        merger.append(file.stream)
+                
+                outputfile = io.BytesIO()
+                merger.write(outputfile)
+                outputfile.seek(0)
+                return send_file(
+                    outputfile,
+                    as_attachment=True,
+                    attachment_filename="merge{}.pdf".format(datetime.datetime.strftime(datetime.datetime.now(),"%Y-%m-%d")))
+            else:
+                flash('Only one file selected')
+                return render_template('index.html')
 
 
     return app
